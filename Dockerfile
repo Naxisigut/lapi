@@ -2,6 +2,10 @@ FROM python:3.8-slim
 
 WORKDIR /app
 
+# 设置 pip 源为国内镜像，并增加超时时间
+RUN pip config set global.index-url https://mirrors.aliyun.com/pypi/simple/ \
+    && pip config set global.timeout 1000
+
 RUN pip install pipenv
 
 COPY Pipfile Pipfile.lock ./
