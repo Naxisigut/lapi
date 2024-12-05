@@ -1,4 +1,4 @@
-FROM python:3.8-slim
+FROM python:3.12.7-slim
 
 WORKDIR /app
 
@@ -12,7 +12,7 @@ COPY Pipfile Pipfile.lock ./
 
 # 确保安装所有必要的依赖
 RUN pipenv install --system --deploy
-RUN pip install uvicorn[standard] anyio
+RUN pip install uvicorn[standard] anyio # 出现anyio模块错误，安装anyio
 
 COPY ./app ./app
 
