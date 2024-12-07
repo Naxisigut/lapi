@@ -8,5 +8,8 @@ fastapi = "*"
 uvicorn = "*"
 pydantic = "*"
 pydantic-settings = "*"
+sqlalchemy = "*"
+pymysql = "*"
+cryptography = "*"
 
 [dev-packages] 

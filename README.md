@@ -1,4 +1,4 @@
-# 项目名称
+# FastAPI MySQL 项目
 
 ## 安装说明
 
@@ -21,60 +21,90 @@
    pipenv install
    ```
 
-4. 激活虚拟环境
-   ```bash
-   pipenv shell
-   ```
+4. 配置数据库
+   - 复制 `.env.example` 为 `.env`
+   - 更新 `.env` 中的数据库配置信息
 
 5. 运行项目
    ```bash
-   uvicorn app.main:app --reload
+   pipenv run uvicorn main:app --reload
    ```
 
 ## 项目结构
+
 ```
-myproject/
-├── app/                    # 主应用目录
-│   ├── __init__.py        # 使app成为一个Python包
-│   ├── main.py            # 应用的入口点，包含FastAPI实例和根路由
-│   │
-│   ├── api/               # API相关代码目录
-│   │   ├── __init__.py
-│   │   └── endpoints/     # API端点目录
-│   │       ├── __init__.py
-│   │       └── items.py   # items相关的路由和处理函数
-│   │
-│   ├── core/              # 核心配置目录
-│   │   ├── __init__.py
-│   │   └── config.py      # 应用配置文件，包含全局设置
-│   │
-│   └── models/            # 数据模型目录
-│       ├── __init__.py
-│       └── item.py        # Item模型定义
-│
-├── Pipfile                # Pipenv依赖管理文件
-├── Pipfile.lock          # Pipenv依赖版本锁定文件
-└── README.md             # 项目说明文档
+lapi/
+├── config/              # 配置文件目录
+│   ├── database.py     # 数据库配置
+│   └── logging_config.py# 日志配置
+├── database/           # 数据库相关代码
+│   └── connection.py   # 数据库连接管理
+├── models/             # SQLAlchemy 模型
+│   └── user.py        # 用户模型定义
+├── routers/            # API 路由
+│   └── users.py       # 用户相关接口
+├── schemas/            # Pydantic 模型
+│   └── user.py        # 用户数据验证模型
+├── logs/              # 日志文件目录（自动创建）
+│   └── app_*.log      # 日志文件
+├── main.py            # 应用入口
+├── Pipfile            # 项目依赖管理
+├── .env               # 环境变量配置
+├── .env.example       # 环境变量示例
+└── .gitignore         # Git忽略配置
 ```
 
-### 主要组件说明：
+### 主要组件说明
 
-1. `app/main.py`
-   - FastAPI应用的主入口
-   - 创建FastAPI实例
-   - 注册路由和中间件
-   - 配置基本的API信息（标题、描述等）
+1. `config/`
+   - 存放配置相关文件
+   - `database.py` 管理数据库连接配置
+   - `logging_config.py` 配置日志系统
 
-2. `app/api/endpoints/`
-   - 包含所有API端点的具体实现
-   - `items.py` 定义了与items相关的所有路由和处理函数
-   - 可以根据功能模块添加更多endpoint文件
+2. `database/`
+   - 数据库连接和会话管理
+   - `connection.py` 提供数据库连接和会话
 
-3. `app/core/`
-   - 存放核心配置和工具
-   - `config.py` 使用pydantic_settings管理应用配置
+3. `models/`
+   - SQLAlchemy ORM 模型定义
+   - `user.py` 定义用户表结构
 
-4. `app/models/`
-   - 定义数据模型
-   - 使用Pydantic模型进行数据验证
-   - `item.py` 定义了Item的数据结构
+4. `routers/`
+   - API 路由和处理函数
+   - `users.py` 实现用户相关的 CRUD 接口
+
+5. `schemas/`
+   - Pydantic 数据验证模型
+   - `user.py` 定义请求和响应的数据结构
+
+6. `logs/`
+   - 存放应用日志文件
+   - 自动创建每日日志文件
+   - 自动轮转（最多保留5个文件）
+
+## API 接口
+
+- API 文档：http://localhost:8000/docs
+- 可用接口：
+  - `GET /api/users/` - 获取用户列表
+  - `POST /api/users/` - 创建新用户
+  - `GET /api/users/{user_id}` - 获取指定用户
+
+## 环境变量
+
+在 `.env` 文件中配置以下环境变量：
+- `DB_HOST`: 数据库主机地址
+- `DB_PORT`: 数据库端口
+- `DB_USER`: 数据库用户名
+- `DB_PASSWORD`: 数据库密码
+- `DB_NAME`: 数据库名称
+
+## 日志系统
+
+- 日志位置：`logs/app_YYYYMMDD.log`
+- 日志级别：INFO 及以上
+- 日志格式：时间 - 模块 - 级别 - 消息
+- 日志分类：
+  - 数据库日志
+  - API日志
+  - 系统日志
