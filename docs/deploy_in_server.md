@@ -24,6 +24,7 @@ sudo docker build -t lapi .
 ```bash
 # 替换 your-dockerhub-username 为您的Docker Hub用户名
 docker tag lapi your-dockerhub-username/lapi:latest
+docker tag lapi lididi/lapi:latest
 ```
 
 3. 登录Docker Hub
@@ -36,6 +37,7 @@ docker login
 
 ```bash
 docker push your-dockerhub-username/lapi:latest
+docker push lididi/lapi:latest
 ```
 
 #### 服务器操作
@@ -49,7 +51,27 @@ sudo docker pull your-dockerhub-username/lapi:latest
 2. 运行容器
 
 ```bash
-sudo docker run -d --name lapi-container -p 8000:8000 your-dockerhub-username/lapi:latest
+# Windows/macOS
+docker run -d \
+  --name lapi-container \
+  -p 8000:8000 \
+  -e DB_HOST="host.docker.internal" \
+  -e DB_PORT="3306" \
+  -e DB_USER="your_username" \
+  -e DB_PASSWORD="your_password" \
+  -e DB_NAME="your_database" \
+  lapi
+
+# Linux
+docker run -d \
+  --name lapi-container \
+  -p 8000:8000 \
+  -e DB_HOST="172.17.0.1" \
+  -e DB_PORT="3306" \
+  -e DB_USER="your_username" \
+  -e DB_PASSWORD="your_password" \
+  -e DB_NAME="your_database" \
+  lapi
 ```
 
 ### 3. 访问应用
@@ -93,3 +115,38 @@ sudo docker restart lapi-container
 1. 用户询问如何将项目部署到云服务器
 2. 提供了完整的部署步骤说明，包括环境准备、项目部署、服务配置等内容
 3. 用户表示希望使用Docker进行简单部署，更新了Docker部署方案
+
+## 环境变量配置
+
+有两种方式配置环境变量：
+
+### 1. 使用 .env 文件
+
+确保 `.env` 文件在项目根目录，包含所需的环境变量：```env
+DATABASE_URL=postgresql://user:password@host:5432/db
+OTHER_ENV_VAR=value
+```
+### 2. 运行时传入环境变量（推荐）
+```bash
+docker run -d \
+  --name lapi-container \
+  -p 8000:8000 \
+  -e DB_HOST="localhost" \
+  -e DB_PORT="3306" \
+  -e DB_USER="your_username" \
+  -e DB_PASSWORD="your_password" \
+  -e DB_NAME="your_database" \
+  lapi
+```
+
+推荐使用运行时传入环境变量的方式，因为：
+1. 更安全：避免敏感信息被构建到镜像中
+2. 更灵活：同一镜像可以用于不同环境（开发、测试、生产）
+3. 符合 Docker 最佳实践
+
+注意：
+- 命令中的 `\` 是续行符，用于将长命令分成多行以提高可读性
+- Windows CMD不支持，需要将命令写在一行：
+```bash
+docker run -d --name lapi-container -p 8000:8000 -e DB_HOST="localhost" -e DB_PORT="3306" -e DB_USER="your_username" -e DB_PASSWORD="your_password" -e DB_NAME="your_database" lapi
+```
