@@ -54,7 +54,7 @@ sudo docker pull your-dockerhub-username/lapi:latest
 # Windows/macOS
 docker run -d \
   --name lapi-container \
-  -p 8000:8000 \
+  -p 8848:8000 \
   -e DB_HOST="host.docker.internal" \
   -e DB_PORT="3306" \
   -e DB_USER="your_username" \
@@ -65,7 +65,7 @@ docker run -d \
 # Linux
 docker run -d \
   --name lapi-container \
-  -p 8000:8000 \
+  -p 8848:8000 \
   -e DB_HOST="172.17.0.1" \
   -e DB_PORT="3306" \
   -e DB_USER="your_username" \
