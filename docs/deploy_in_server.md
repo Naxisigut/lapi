@@ -150,3 +150,22 @@ docker run -d \
 ```bash
 docker run -d --name lapi-container -p 8000:8000 -e DB_HOST="localhost" -e DB_PORT="3306" -e DB_USER="your_username" -e DB_PASSWORD="your_password" -e DB_NAME="your_database" lapi
 ```
+
+### 数据库连接配置
+当前服务器设置数据库连接信息如下：
+```
+DB_HOST=172.17.0.1
+DB_PORT=3306
+DB_USER=lapi_user
+DB_PASSWORD=******
+DB_NAME=lapi
+```
+在容器运行时因连接超时报错。经检查发现服务器的防火墙没有允许3306端口。
+```
+# 检查防火墙状态
+sudo ufw status
+
+# 如果需要，允许 MySQL 端口
+sudo ufw allow 3306
+```
+执行后，重启容器，连接成功。

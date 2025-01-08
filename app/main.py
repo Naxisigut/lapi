@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from app.api.endpoints import items
+from app.api.endpoints import items, base
 from app.config.database import engine, Base
 import logging
 
@@ -18,6 +18,7 @@ except Exception as e:
 
 # 包含路由
 app.include_router(items.router, prefix="/api/v1")
+app.include_router(base.router, prefix="/api/v1")
 
 @app.get("/")
 async def root():

@@ -115,8 +115,121 @@
    - VSCode的Python插件提供了良好的开发体验
    - 正确配置解释器可以获得代码补全和类型提示
 
-## 注意事项
 
-- 每次讨论都应该记录日期
-- 重要的技术决策需要记录原因
-- 遇到的问题和解决方案要详细描述 
+
+## 2025-01-09
+### FastAPI 请求处理
+
+#### 1. 接收请求头（Headers）
+
+```python
+@router.get("/hello")
+async def hello(
+    test: str = Header(),              # 接收必需的请求头
+    user_agent: str = Header(),        # 可以接收多个请求头
+    custom_header: str = Header(default=None)  # 可选的请求头
+):
+    return {
+        "test_header": test,
+        "user_agent": user_agent,
+        "custom": custom_header
+    }
+```
+
+对应的前端请求：
+```javascript
+fetch('/api/v1/hello', {
+    headers: {
+        'test': 'get',
+        'user-agent': 'Mozilla/5.0',
+        'custom-header': 'value'
+    }
+})
+```
+
+#### 2. 接收请求体（Body）
+
+```python
+from pydantic import BaseModel
+
+class UserRequest(BaseModel):
+    username: str
+    password: str
+    age: int | None = None  # 可选字段
+
+@router.post("/users")
+async def create_user(user: UserRequest):  # 直接接收请求体
+    return {
+        "username": user.username,
+        "age": user.age
+    }
+```
+
+对应的前端请求：
+```javascript
+fetch('/api/v1/users', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+        username: 'john',
+        password: '123456',
+        age: 25
+    })
+})
+```
+
+#### 3. 同时接收请求头和请求体
+
+```python
+@router.post("/hello")
+async def hello_post(
+    request: HelloRequest,           # 请求体
+    token: str = Header(),          # 必需的请求头
+    trace_id: str = Header(default=None)  # 可选的请求头
+):
+    return {
+        "body": request.dict(),
+        "token": token,
+        "trace_id": trace_id
+    }
+```
+
+对应的前端请求：
+```javascript
+fetch('/api/v1/hello', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+        'token': 'xxx',
+        'trace-id': '123'
+    },
+    body: JSON.stringify({
+        test: 'post'
+    })
+})
+```
+
+#### 特点说明
+
+1. FastAPI 自动处理：
+   - 请求参数验证
+   - 数据类型转换
+   - API 文档生成
+   - 类型提示
+
+2. Pydantic 模型：
+   - 用于定义请求体的结构
+   - 提供数据验证
+   - 类似 TypeScript 的接口定义
+
+3. Header 参数：
+   - 可设置默认值
+   - 可设置是否必需
+   - 自动处理大小写转换
+
+4. 错误处理：
+   - 自动生成错误响应
+   - 参数验证失败时返回 422 状态码
+   - 可自定义错误处理 
